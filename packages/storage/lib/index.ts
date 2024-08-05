@@ -1,4 +1,5 @@
 import { createStorage, StorageType, type BaseStorage, SessionAccessLevel } from './base';
-import { exampleThemeStorage } from './exampleThemeStorage';
+import { socialIdStorage } from './socialIdStorage';
+import { bannedSiteStorage } from './bannedSiteStorage';
 
-export { exampleThemeStorage, createStorage, StorageType, SessionAccessLevel, BaseStorage };
+export { socialIdStorage, bannedSiteStorage, createStorage, StorageType, SessionAccessLevel, BaseStorage };
