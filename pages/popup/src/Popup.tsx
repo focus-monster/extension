@@ -2,6 +2,7 @@ import '@src/Popup.css';
 import { useStorageSuspense, withErrorBoundary, withSuspense } from '@extension/shared';
 import { bannedSiteStorage, socialIdStorage } from '@extension/storage';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 type Session = {
   id: number;
@@ -52,8 +53,12 @@ export function Auth() {
 
   if (!data) {
     return (
-      <a target="_blank" rel="noreferrer" href="https://focusmonster.me" className=" font-semibold hover:underline">
-        Go to Homepage
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href="https://focusmonster.me"
+        className=" font-semibold hover:underline underline-offset-2">
+        Go to Homepage 🏠
       </a>
     );
   }
@@ -63,22 +68,65 @@ export function Auth() {
       target="_blank"
       rel="noreferrer"
       href="https://focusmonster.me"
-      className=" font-semibold hover:underline">{`${data.nickname}'s home`}</a>
+      className=" font-semibold hover:underline underline-offset-2">{`${data.nickname}'s home 🏠`}</a>
   );
 }
 
 function SmallBox() {
   return (
     <div
+      className="flex flex-col items-center"
       style={{
         backgroundImage: 'url(/box-sm.png)',
         backgroundSize: 'cover',
         width: '610px',
         height: '270px',
       }}>
-      <div className="w-full flex justify-end py-3 text-lg px-10">
+      <div className="w-full flex justify-end py-3.5 text-lg px-10">
         <Auth />
       </div>
+      <div className="w-full flex flex-col items-center grow py-6">
+        <FocusAction />
+      </div>
+    </div>
+  );
+}
+
+function FocusAction() {
+  const [hours, setHours] = useState(0);
+  const [minutes, setMinutes] = useState(30);
+  return (
+    <div className="flex flex-row gap-4 text-lg items-center font-semibold">
+      <div>Set Duration:</div>
+      <div>
+        <input
+          className="border-2 w-10"
+          type="number"
+          min="0"
+          name="hours"
+          id="hours"
+          value={hours}
+          onChange={e => {
+            setHours(Number(e.target.value));
+          }}
+        />{' '}
+        h
+      </div>
+      <div>
+        <input
+          className="border-2 w-10"
+          type="number"
+          min="0"
+          name="minutes"
+          id="minutes"
+          value={minutes}
+          onChange={e => {
+            setMinutes(Number(e.target.value));
+          }}
+        />{' '}
+        m
+      </div>
+      <button className="bg-black text-white px-4 py-1 rounded-lg">Focus Now</button>
     </div>
   );
 }
