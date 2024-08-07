@@ -11,7 +11,7 @@ function getTab() {
   return tabs;
 }
 
-async function checkForHome(tab: string) {
+function checkForHome(tab: string) {
   const domain = new URL(tab).hostname;
   return HOME.includes(domain);
 }
@@ -27,8 +27,9 @@ async function fetchStorageValue(key: string) {
 async function main() {
   try {
     const tab = getTab();
+    const isHome = checkForHome(tab);
 
-    if (!checkForHome(tab)) {
+    if (!isHome) {
       console.log('Not on home page');
       return;
     }
