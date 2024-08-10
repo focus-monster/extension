@@ -27,7 +27,7 @@ const manifest = deepmerge(
     name: '__MSG_extensionName__',
     version: packageJson.version,
     description: '__MSG_extensionDescription__',
-    host_permissions: ['https://focusmoster.me:8080/*'],
+    host_permissions: ['https://focusmonster.me:8080/*'],
     permissions: ['storage', 'scripting', 'tabs', 'activeTab'],
     options_page: 'options/index.html',
     background: {
@@ -37,9 +37,6 @@ const manifest = deepmerge(
     action: {
       default_popup: 'popup/index.html',
       default_icon: 'icon-34.png',
-    },
-    chrome_url_overrides: {
-      newtab: 'new-tab/index.html',
     },
     icons: {
       128: 'icon-128.png',
