@@ -2,6 +2,7 @@ import { useStorageSuspense } from '@extension/shared';
 import { bannedSiteStorage, socialIdStorage } from '@extension/storage';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import { queryClient } from '.';
 
 export function FocusAction() {
   const [hours, setHours] = useState(0);
@@ -11,7 +12,7 @@ export function FocusAction() {
   const { mutate } = useMutation({
     mutationKey: ['focus'],
     mutationFn: async () => {
-      await fetch('/api/focus', {
+      await fetch('https://focusmonster.me:8080/focus', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,6 +24,10 @@ export function FocusAction() {
           bannedSites: bannedSites,
         }),
       });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['session'] });
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
   });
 

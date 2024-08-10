@@ -19,13 +19,13 @@ export function Character() {
   });
 
   return (
-    <div className="flex flex-col items-center grow justify-end p-4 w-40">
-      <img src={CharacterImageString(data?.level)} className="w-28 aspect-auto" alt="" />
+    <div className="flex flex-col items-center grow justify-end pb-4 pt-2 w-40">
+      <img src={CharacterImageString(data?.level)} className="w-24 aspect-auto" alt="" />
     </div>
   );
 }
 function CharacterImageString(level?: number) {
-  if (!level) return '';
+  if (!level) return '/0.png';
   if (level === 0) return '/0.png';
   if (level === 1) return '/1.png';
   if (level <= 5) return '/5.png';

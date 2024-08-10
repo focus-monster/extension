@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from './auth';
 import { useMemo } from 'react';
+import { useStorageSuspense } from '@extension/shared';
+import { socialIdStorage } from '@extension/storage';
 
 export type Session = {
   id: number;
@@ -22,12 +23,17 @@ export type Session = {
 };
 
 export function useSessions() {
-  const { data: auth } = useAuth();
+  const socialId = useStorageSuspense(socialIdStorage);
 
   const query = useQuery<Session[]>({
     queryKey: ['session'],
     queryFn: async () => {
-      const response = await fetch(`/api/focus?socialId=${auth?.socialId}`);
+      const response = await fetch(`https://focusmonster.me:8080/focus?socialId=${socialId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       const data = await response.json();
       return data as Session[];
     },

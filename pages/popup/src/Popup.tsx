@@ -2,7 +2,6 @@ import '@src/Popup.css';
 import { useStorageSuspense, withErrorBoundary, withSuspense } from '@extension/shared';
 import { bannedSiteStorage, socialIdStorage } from '@extension/storage';
 import { SmallBox } from './small-box';
-import { useAuth } from './hooks/auth';
 
 export type Session = {
   id: number;
@@ -26,8 +25,6 @@ export type Session = {
 };
 
 const Popup = () => {
-  const { data } = useAuth();
-
   return <SmallBox />;
 };
 
