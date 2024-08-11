@@ -20,6 +20,8 @@ export type Session = {
   evaluation: string;
   createdDateTime: string;
   lastModifiedDateTime: string;
+  level: number;
+  nickname: string;
 };
 
 export function useSessions() {

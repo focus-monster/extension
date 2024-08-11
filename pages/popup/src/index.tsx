@@ -3,6 +3,7 @@ import '@src/index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { ErrorProvider } from './error';
+import { ResultProvider } from './result';
 
 export const queryClient = new QueryClient();
 
@@ -16,7 +17,9 @@ function init() {
   root.render(
     <QueryClientProvider client={queryClient}>
       <ErrorProvider>
-        <Popup />
+        <ResultProvider>
+          <Popup />
+        </ResultProvider>
       </ErrorProvider>
     </QueryClientProvider>,
   );

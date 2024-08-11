@@ -1,5 +1,5 @@
 import { useStorageSuspense } from '@extension/shared';
-import { bannedSiteStorage, focusStorage, socialIdStorage } from '@extension/storage';
+import { bannedSiteLogStorage, bannedSiteStorage, focusStorage, socialIdStorage } from '@extension/storage';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { queryClient } from '.';
@@ -32,6 +32,7 @@ export function FocusAction() {
       queryClient.invalidateQueries({ queryKey: ['session'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
       focusStorage.set('true');
+      bannedSiteLogStorage.set(JSON.stringify({}));
     },
     onError: error => {
       setError(error.message);

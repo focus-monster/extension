@@ -21,7 +21,8 @@
     "postinstall": "pnpm run build:tailwindcss"
   },
   "dependencies": {
-    "@extension/shared": "workspace:*"
+    "@extension/shared": "workspace:*",
+    "@extension/storage": "workspace:*"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",

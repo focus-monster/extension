@@ -1,17 +1,18 @@
+import { useAuth, useSessions, useStorageSuspense, type Session } from '@extension/shared';
+import { bannedSiteLogStorage, focusStorage } from '@extension/storage';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { queryClient } from '.';
 import { Auth } from './auth-button';
 import { Character } from './character';
-import { FocusAction } from './focus-action';
-import { Session, useSessions } from './hooks/session';
-import { useAuth } from './hooks/auth';
-import { useMutation } from '@tanstack/react-query';
-import { queryClient } from '.';
 import { useError } from './error';
-import { useStorageSuspense } from '@extension/shared';
-import { bannedSiteStorage, focusStorage } from '@extension/storage';
+import { FocusAction } from './focus-action';
+import { useResult } from './result';
 
 export function SmallBox() {
   const { isFocusing, isLoading } = useSessions();
+  const bannedSiteLog = JSON.parse(useStorageSuspense(bannedSiteLogStorage)) as { [key: string]: number };
+  console.log(bannedSiteLog);
 
   useEffect(() => {
     focusStorage.set(JSON.stringify(isFocusing));
@@ -61,12 +62,13 @@ function Focusing() {
   }, [lastSession]);
 
   const { setError } = useError();
+  const { setResult } = useResult();
 
-  const bannedSitesLog = JSON.parse(useStorageSuspense(bannedSiteStorage)) as { [key: string]: number };
+  const bannedSitesLog = JSON.parse(useStorageSuspense(bannedSiteLogStorage)) as { [key: string]: number };
 
-  const { mutate } = useMutation({
+  const { mutate } = useMutation<Session, Error, 'succeed' | 'fail'>({
     mutationKey: ['focus-end'],
-    mutationFn: async (result: 'succeed' | 'fail') => {
+    mutationFn: async result => {
       const res = await fetch('https://focusmonster.me:8080/focus/' + result, {
         method: 'POST',
         headers: {
@@ -75,17 +77,20 @@ function Focusing() {
         body: JSON.stringify({
           socialId: lastSession?.userSocialId,
           focusId: lastSession?.id,
-          banedSitesAccessLog: Object.entries(bannedSitesLog).map(([name, count]) => ({ name, count })),
+          banedSiteAccessLog: Object.entries(bannedSitesLog).map(([name, count]) => ({ name, count })),
         }),
       });
       if (!res.ok) {
         throw new Error(await res.text());
       }
-      return res;
+      return (await res.json()) as Session;
     },
-    onSuccess: () => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
+
+      focusStorage.set('false');
+      setResult(data);
     },
     onError: error => {
       console.log('error', error);
