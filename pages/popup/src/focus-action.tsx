@@ -3,12 +3,15 @@ import { bannedSiteStorage, socialIdStorage } from '@extension/storage';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { queryClient } from '.';
+import { useError } from './error';
 
 export function FocusAction() {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(30);
   const socialId = useStorageSuspense(socialIdStorage);
   const bannedSites = useStorageSuspense(bannedSiteStorage);
+
+  const { setError } = useError();
   const { mutate } = useMutation({
     mutationKey: ['focus'],
     mutationFn: async () => {
@@ -28,6 +31,9 @@ export function FocusAction() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
+    },
+    onError: error => {
+      setError(error.message);
     },
   });
 

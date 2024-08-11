@@ -6,9 +6,16 @@ import { Session, useSessions } from './hooks/session';
 import { useAuth } from './hooks/auth';
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '.';
+import { useError } from './error';
+import { useStorageSuspense } from '@extension/shared';
+import { bannedSiteStorage } from '@extension/storage';
 
 export function SmallBox() {
-  const { isFocusing } = useSessions();
+  const { isFocusing, isLoading } = useSessions();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div
@@ -40,19 +47,23 @@ export function SmallBox() {
 
 function Focusing() {
   const { lastSession } = useSessions();
-  const [error, setError] = useState('');
 
   const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft(lastSession));
 
   useEffect(() => {
-    const ref = setInterval(() => setTimeLeft(() => calculateTimeLeft(lastSession)), 1000);
+    const ref = setInterval(() => setTimeLeft(calculateTimeLeft(lastSession)), 1000);
+    setTimeLeft(calculateTimeLeft(lastSession));
     return () => clearInterval(ref);
   }, [lastSession]);
 
+  const { setError } = useError();
+
+  const bannedSites = JSON.parse(useStorageSuspense(bannedSiteStorage)) as string[];
+
   const { mutate } = useMutation({
     mutationKey: ['focus-end'],
-    mutationFn: async () => {
-      await fetch('https://focusmonster.me:8080/focus/success', {
+    mutationFn: async (result: 'succeed' | 'fail') => {
+      const res = await fetch('https://focusmonster.me:8080/focus/' + result, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,28 +71,39 @@ function Focusing() {
         body: JSON.stringify({
           socialId: lastSession?.userSocialId,
           focusId: lastSession?.id,
-          banedSitesAccessLog: lastSession?.banedSiteAccessLog,
+          banedSitesAccessLog: bannedSites.map(site => ({ name: site, count: 1 })),
         }),
       });
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
     onError: error => {
-      console.log('error', error.message, error.cause, error.name);
+      console.log('error', error);
       setError(error.message);
     },
   });
 
+  const isTimeEnded = timeLeft.hours < 0;
+
+  function handleClick() {
+    if (isTimeEnded) {
+      mutate('succeed');
+    } else {
+      mutate('fail');
+    }
+  }
+
   return (
     <>
-      {error.length > 0 ? (
-        <div className="bg-red-600 rounded-lg text-white absolute text-center top-4 px-4 py-2 z-50">{error}</div>
-      ) : null}
       <div className="text-xl font-semibold text-green-600">UNTIL LEVEL UP</div>
       <div className="text-6xl font-bold">
-        {timeLeft.hours} h {timeLeft.minutes} m
+        {Math.abs(timeLeft.hours + (isTimeEnded ? 1 : 0))} h {Math.abs(timeLeft.minutes)} m
       </div>
       <div className="absolute left-14 bottom-0">
         <CharacterOverlay />
@@ -89,11 +111,12 @@ function Focusing() {
       </div>
       <div className="grow pr-10 pb-8 flex items-end w-full justify-end">
         <button
-          onClick={() => {
-            mutate();
-          }}
-          className="bg-neutral-400 text-white font-bold rounded-lg px-4 py-2 mt-4 text-lg hover:bg-neutral-500 transition-colors">
-          Quit Focusing
+          onClick={handleClick}
+          className={
+            'text-white font-bold rounded-lg px-4 py-2 mt-4 text-lg transition-colors ' +
+            (isTimeEnded ? 'bg-neutral-900 hover:bg-neutral-700' : 'bg-neutral-400 hover:bg-neutral-500')
+          }>
+          {isTimeEnded ? 'Finish Focusing' : 'Quit Focusing'}
         </button>
       </div>
     </>
@@ -134,11 +157,10 @@ function calculateTimeLeft(lastSession?: Session) {
 
     const timeDiff = duration - elapsedTime;
 
-    if (timeDiff > 0) {
-      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-      return { hours, minutes };
-    }
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.ceil((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+    return { hours, minutes };
   }
   return { hours: 0, minutes: 0 };
 }

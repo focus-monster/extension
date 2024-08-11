@@ -2,6 +2,7 @@ import Popup from '@src/Popup';
 import '@src/index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
+import { ErrorProvider } from './error';
 
 export const queryClient = new QueryClient();
 
@@ -14,7 +15,9 @@ function init() {
 
   root.render(
     <QueryClientProvider client={queryClient}>
-      <Popup />
+      <ErrorProvider>
+        <Popup />
+      </ErrorProvider>
     </QueryClientProvider>,
   );
 }
