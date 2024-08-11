@@ -8,10 +8,14 @@ import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '.';
 import { useError } from './error';
 import { useStorageSuspense } from '@extension/shared';
-import { bannedSiteStorage } from '@extension/storage';
+import { bannedSiteStorage, focusStorage } from '@extension/storage';
 
 export function SmallBox() {
   const { isFocusing, isLoading } = useSessions();
+
+  useEffect(() => {
+    focusStorage.set(JSON.stringify(isFocusing));
+  }, [isFocusing]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -58,7 +62,7 @@ function Focusing() {
 
   const { setError } = useError();
 
-  const bannedSites = JSON.parse(useStorageSuspense(bannedSiteStorage)) as string[];
+  const bannedSitesLog = JSON.parse(useStorageSuspense(bannedSiteStorage)) as { [key: string]: number };
 
   const { mutate } = useMutation({
     mutationKey: ['focus-end'],
@@ -71,7 +75,7 @@ function Focusing() {
         body: JSON.stringify({
           socialId: lastSession?.userSocialId,
           focusId: lastSession?.id,
-          banedSitesAccessLog: bannedSites.map(site => ({ name: site, count: 1 })),
+          banedSitesAccessLog: Object.entries(bannedSitesLog).map(([name, count]) => ({ name, count })),
         }),
       });
       if (!res.ok) {
