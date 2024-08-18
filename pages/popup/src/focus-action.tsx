@@ -1,11 +1,11 @@
-import { useStorageSuspense } from '@extension/shared';
+import { type Session, useStorageSuspense } from '@extension/shared';
 import { bannedSiteLogStorage, bannedSiteStorage, focusStorage, socialIdStorage } from '@extension/storage';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { queryClient } from '.';
 import { useError } from './error';
 
-export function FocusAction() {
+export function FocusAction({ setResult }: { setResult: (result: Session) => void }) {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(30);
   const socialId = useStorageSuspense(socialIdStorage);
@@ -15,7 +15,7 @@ export function FocusAction() {
   const { mutate } = useMutation({
     mutationKey: ['focus'],
     mutationFn: async () => {
-      await fetch('https://focusmonster.me:8080/focus', {
+      const request = await fetch('https://focusmonster.me:8080/focus', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,12 +27,18 @@ export function FocusAction() {
           bannedSites: bannedSites,
         }),
       });
+      const res = await request.json();
+      if (!request.ok) {
+        throw new Error(res.message);
+      }
+      return res as Session;
     },
-    onSuccess: () => {
+    onSuccess: res => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
       focusStorage.set('true');
       bannedSiteLogStorage.set(JSON.stringify({}));
+      setResult(res);
     },
     onError: error => {
       setError(error.message);

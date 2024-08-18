@@ -10,6 +10,10 @@ export type Session = {
     hours: number;
     minutes: number;
   };
+  resultDuration: {
+    hours: number;
+    minutes: number;
+  };
   banedSiteAccessLog: {
     name: string;
     count: number;
@@ -21,7 +25,6 @@ export type Session = {
   createdDateTime: string;
   lastModifiedDateTime: string;
   level: number;
-  nickname: string;
 };
 
 export function useSessions() {

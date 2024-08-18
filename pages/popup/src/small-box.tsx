@@ -9,7 +9,7 @@ import { useError } from './error';
 import { FocusAction } from './focus-action';
 import { useResult } from './result';
 
-export function SmallBox() {
+export function SmallBox({ setResult }: { setResult: (result: Session) => void }) {
   const { isFocusing, isLoading } = useSessions();
   const bannedSiteLog = JSON.parse(useStorageSuspense(bannedSiteLogStorage)) as { [key: string]: number };
   console.log(bannedSiteLog);
@@ -41,7 +41,7 @@ export function SmallBox() {
           </>
         ) : (
           <>
-            <FocusAction />
+            <FocusAction setResult={setResult} />
             <Character />
           </>
         )}
