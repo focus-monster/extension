@@ -1,5 +1,4 @@
 packages:
   - 'chrome-extension'
-  - 'pages/content'
-  - 'pages/popup'
+  - 'pages/*'
   - 'packages/*'

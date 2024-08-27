@@ -1,4 +1,4 @@
-import { useAuth } from '../../../shared';
+import { useAuth } from '@extension/shared';
 
 export function Auth() {
   const { data, isLoading } = useAuth();
