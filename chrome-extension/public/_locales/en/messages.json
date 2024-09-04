@@ -4,7 +4,7 @@
     "message": "FocusMonster is a productivity tracker that helps you stay focused and be more productive."
   },
   "extensionName": {
-    "description": "FocusMonster",
-    "message": "Productivity Tracker"
+    "description": "Productivity Tracker",
+    "message": "FocusMonster"
   }
 }
