@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension",
-  "version": "0.2.2",
-  "description": "chrome extension",
+  "name": "focus-monster",
+  "version": "0.2.3",
+  "description": "FocusMonster",
   "scripts": {
     "clean": "rimraf ../../dist",
     "build": "tsc --noEmit && vite build",
