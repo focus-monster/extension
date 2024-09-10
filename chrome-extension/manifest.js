@@ -17,7 +17,7 @@ const manifest = {
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
   host_permissions: ['https://focusmonster.me:8080/*'],
-  permissions: ['storage'],
+  permissions: ['storage', 'desktopCapture'],
   background: {
     service_worker: 'background.iife.js',
     type: 'module',

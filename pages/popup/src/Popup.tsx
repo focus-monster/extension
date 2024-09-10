@@ -4,7 +4,9 @@ import { bannedSiteStorage, socialIdStorage } from '@extension/storage';
 import { SmallBox } from './small-box';
 import { useError } from './error';
 import { Auth } from './auth-button';
-import { useState } from 'react';
+import { cn } from '@extension/ui';
+import { useContext } from 'react';
+import { resultContext } from './result';
 
 const result = {
   id: 43,
@@ -38,7 +40,7 @@ type Result = typeof result;
 const Popup = () => {
   const { error } = useError();
   const { data: auth } = useAuth();
-  const [result, setResult] = useState<Session>();
+  const { result } = useContext(resultContext);
 
   return (
     <>
@@ -47,7 +49,7 @@ const Popup = () => {
           {error}
         </div>
       ) : null}
-      {result ? <BigBox result={{ ...result, level: auth?.level ?? 0 }} /> : <SmallBox setResult={setResult} />}
+      {result ? <BigBox result={{ ...result, level: auth?.level ?? 0 }} /> : <SmallBox />}
     </>
   );
 };
@@ -68,7 +70,7 @@ function BigBox({ result }: { result: Session & { level: number } }) {
       <div className="w-full h-[500px] flex flex-col items-center grow py-6 overflow-hidden">
         <div className="grid grid-cols-[1fr,2fr] px-6 gap-2 h-full">
           <Result result={result.focusStatus} />
-          <div className="text-lg font-semibold px-2 line-clamp-4">{JSON.parse(result.evaluation)}</div>
+          <div className="text-base font-semibold px-2 line-clamp-4">{JSON.parse(result.evaluation)}</div>
           <div className="px-2 flex flex-col justify-between">
             <Duration duration={result.resultDuration} />
             <Level level={result.level} result={result.focusStatus} />
@@ -95,8 +97,8 @@ function Result({ result }: { result: string }) {
 
 function Duration({ duration }: { duration: { hours: number; minutes: number } }) {
   return (
-    <div className="w-full py-2 flex flex-row gap-4">
-      <img src="/clock.png" alt="clock" />
+    <div className="w-full py-2 flex flex-row gap-4 items-center">
+      <img style={{ width: '46px', height: '45px' }} src="/clock.png" alt="clock" />
       <div>
         <div className="font-semibold">You stayed focus for</div>
         <div className="text-4xl font-bold">
@@ -108,21 +110,24 @@ function Duration({ duration }: { duration: { hours: number; minutes: number } }
 }
 
 function Level({ level, result }: { level: number; result: string }) {
+  const { isLoading } = useAuth();
   return (
-    <div className="w-full py-2 flex flex-row gap-4">
+    <div className="w-full py-2 flex flex-row gap-4 items-center">
       <img src={result === 'SUCCEED' ? '/up.png' : '/stop.png'} alt="level" />
       <div>
-        <div className="font-semibold">{result === 'SUCCEED' ? 'Level up' : 'Stays at'}</div>
-        <div className="text-4xl font-bold">LV. {level}</div>
+        <div className="font-semibold">{result === 'SUCCEED' ? 'Level up' : 'Level stays at'}</div>
+        <div className="text-4xl font-bold flex items-center gap-2">
+          LV. {isLoading ? <div className="w-8 h-8 bg-black/20 rounded-lg animate-pulse"></div> : level}
+        </div>
       </div>
     </div>
   );
 }
 
 function Character({ result, level }: { result: string; level: number }) {
-  const url = `${result === 'SUCCEED' ? 'success/' : 'fail/'}` + `${levelMap(level)}.png`;
+  const url = `${result === 'SUCCEED' ? '/success/' : '/fail/'}` + `${levelMap(level)}.png`;
   return (
-    <div className="pt-4">
+    <div className={cn('pt-4')}>
       <img src={url} alt={url} width="176px" height="162px"></img>
     </div>
   );

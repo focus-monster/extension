@@ -4,7 +4,7 @@ import { socialIdStorage } from '@extension/storage';
 
 export function Character() {
   const socialId = useStorageSuspense(socialIdStorage);
-  const { data } = useQuery<Session>({
+  const { data, isLoading } = useQuery<Session>({
     queryKey: ['auth'],
     queryFn: async () => {
       const response = await fetch(`https://focusmonster.me:8080/users/${socialId}`, {
@@ -19,7 +19,11 @@ export function Character() {
 
   return (
     <div className="flex flex-col items-center grow justify-end pb-4 pt-2 w-40">
-      <img src={CharacterImageString(data?.level)} className="w-24 aspect-auto" alt="" />
+      {isLoading ? (
+        <div className="w-24 h-24 bg-gray-200 animate-pulse rounded-3xl" />
+      ) : (
+        <img src={CharacterImageString(data?.level)} className="w-24 aspect-auto" alt="" />
+      )}
     </div>
   );
 }

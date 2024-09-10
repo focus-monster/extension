@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { queryClient } from '.';
 import { useError } from './error';
 
-export function FocusAction({ setResult }: { setResult: (result: Session) => void }) {
+export function FocusAction() {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(30);
   const socialId = useStorageSuspense(socialIdStorage);
@@ -33,12 +33,11 @@ export function FocusAction({ setResult }: { setResult: (result: Session) => voi
       }
       return res as Session;
     },
-    onSuccess: res => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
       focusStorage.set('true');
       bannedSiteLogStorage.set(JSON.stringify({}));
-      setResult(res);
     },
     onError: error => {
       setError(error.message);
