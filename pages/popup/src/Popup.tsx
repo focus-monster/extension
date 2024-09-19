@@ -5,7 +5,7 @@ import { SmallBox } from './small-box';
 import { useError } from './error';
 import { Auth } from './auth-button';
 import { cn } from '@extension/ui';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { resultContext } from './result';
 
 const result = {
@@ -40,7 +40,22 @@ type Result = typeof result;
 const Popup = () => {
   const { error } = useError();
   const { data: auth } = useAuth();
-  const { result } = useContext(resultContext);
+  const { result, setResult } = useContext(resultContext);
+
+  useEffect(() => {
+    const port = chrome.runtime.connect({ name: 'popup' });
+    port.postMessage({ action: 'popupMounted' });
+    port.onMessage.addListener(message => {
+      setResult(null);
+      if (message.action === 'setResult') {
+        setResult(JSON.parse(message.payload));
+      }
+    });
+
+    return () => {
+      port.disconnect();
+    };
+  });
 
   return (
     <>

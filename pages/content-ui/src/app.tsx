@@ -36,12 +36,6 @@ export default function App() {
     <div>
       <button
         onClick={() => {
-          chrome.runtime.sendMessage({ action: 'openPopup' });
-        }}>
-        OPEN POPUP
-      </button>
-      <button
-        onClick={() => {
           chrome.runtime.sendMessage({ action: 'requestCapture' }, response => {
             if (response.success) {
               getMedia(response.streamId);
@@ -102,3 +96,30 @@ function useVideo() {
     };
   }, []);
 }
+
+const result = {
+  id: 43,
+  userSocialId: '108486714610924629947',
+  duration: {
+    hours: 0,
+    minutes: 30,
+  },
+  banedSiteAccessLog: [],
+  history: [
+    "\n[User's Profession]\nThe user’s profession is 'software engineer'. Note that today’s task might not be related to their profession.\n\n[Focus Time]\nThe user decided to focus for 0 hours and 30 minutes.\n\n",
+    '\n[User\'s Decided Goal]\n""\n\n',
+    '\n[Monitoring]      \n',
+    '',
+    "\n[Result]\nThe user didn’t hit the focus time goal. \n\nBased on the [Monitoring], If there were distractions to [User's Decided Goal], call them out, but also give some encouragement! \n    \nYou must provide an evaluation between 140~200 characters in english. Make sure to keep the tone playful like a naughty boy speeching.\n",
+  ],
+  focusStatus: 'FAILED',
+  image: 'https://kr.object.ncloudstorage.com/gemini/failure/My%20fellow%20office%20worker.jpg',
+  evaluation:
+    '"Aw man, you only focused for 30 minutes?  That\'s like, a blink of an eye in the grand scheme of things!  Come on, you can do better than that! 😜  Let\'s try to stay on track tomorrow, alright?\\n"',
+  resultDuration: {
+    hours: 0,
+    minutes: 0,
+  },
+  createdDateTime: '2024-08-11T10:12:32.429',
+  lastModifiedDateTime: '2024-08-11T10:12:35.751',
+};

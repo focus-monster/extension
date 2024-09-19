@@ -44,6 +44,12 @@ createRoot(rootIntoShadow).render(
   </QueryClientProvider>,
 );
 
+window.addEventListener('message', async event => {
+  if (event.data.action === 'openPopup') {
+    chrome.runtime.sendMessage({ action: 'openPopup', payload: event.data.payload });
+  }
+});
+
 const main = async () => {
   const hostname = new URL(window.location.href).hostname;
   const bannedSites = (await JSON.parse(await bannedSiteStorage.get())) as string[];
