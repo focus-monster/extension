@@ -45,6 +45,7 @@ const Popup = () => {
   useEffect(() => {
     const port = chrome.runtime.connect({ name: 'popup' });
     port.postMessage({ action: 'popupMounted' });
+
     port.onMessage.addListener(message => {
       setResult(null);
       if (message.action === 'setResult') {

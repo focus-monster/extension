@@ -30,15 +30,6 @@ export function SmallBox() {
       <div className="w-full flex justify-end py-3.5 text-lg px-10">
         <Auth />
       </div>
-      <button
-        onClick={() => {
-          chrome.runtime.sendMessage({ action: 'requestCapture' }, response => {
-            //Alert the message
-            console.log('The response from the background page: ' + response); //You have to choose which part of the response you want to display ie. response.response
-          });
-        }}>
-        START CAPTURE
-      </button>
       <div className="w-full flex flex-col items-center grow pt-4 overflow-hidden">
         {isFocusing ? (
           <>

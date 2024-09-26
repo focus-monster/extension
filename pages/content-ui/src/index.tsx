@@ -56,12 +56,10 @@ const main = async () => {
   const isFocus = (await JSON.parse(await focusStorage.get())) as boolean;
 
   if (isFocus && bannedSites.some(site => hostname.includes(site.toLowerCase()))) {
-    console.log("You're on a banned site");
     const bannedSite = capitalizeFirstLetter(bannedSites.find(site => hostname.includes(site))!);
 
     if (bannedSite) {
       const bannedSiteLog = (await JSON.parse(await bannedSiteLogStorage.get())) as { [key: string]: number };
-      console.log('before: ', bannedSiteLog);
       if (typeof bannedSiteLog[bannedSite] === 'undefined') {
         bannedSiteLog[bannedSite] = 0;
       } else {
@@ -69,7 +67,6 @@ const main = async () => {
       }
 
       await bannedSiteLogStorage.set(JSON.stringify(bannedSiteLog));
-      console.log('after: ', bannedSiteLog);
     }
   }
 };
